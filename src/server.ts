@@ -2,6 +2,7 @@
 import http from "http";
 import path from "path";
 import { Server } from "socket.io";
+import { fromIni } from "@aws-sdk/credential-providers";
 import cors from "cors";
 import { NovaSonicBidirectionalStreamClient } from "./core/client";
 import { Buffer } from "node:buffer";
@@ -10,22 +11,17 @@ import { McpManager } from "./services/mcp-manager-v2";
 ///import { McpManager } from "./services/mcp-manager";
 import { McpTool } from "./types/types";
 
-// AWS credentials will be automatically loaded from:
-// 1. Environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
-// 2. IAM role (in AWS App Runner, EC2, ECS, Lambda)
-// 3. Local credentials file (for local development)
+// Configure AWS credentials
+const AWS_PROFILE_NAME = process.env.AWS_PROFILE || "default";
 
 // Create Express app and HTTP server
 const app = express();
-// Determine CORS origin based on environment
-const allowedOrigins = process.env.NODE_ENV === 'production' 
-  ? ['*'] // Allow all origins in production (App Runner)
-  : ['http://localhost:3000', 'http://localhost:3001'];
 
+const allowedOrigins = ['*'] ;
 
 // Enable CORS with specific options
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' ? '*' : allowedOrigins,
+  origin: '*',
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: [
@@ -50,9 +46,8 @@ app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
 const server = http.createServer(app);
 const io = new Server(server, {
-  path: '/socket.io/',
   cors: {
-    origin: process.env.NODE_ENV === 'production' ? '*' : allowedOrigins,
+    origin: '*',
     methods: ["GET", "POST", "OPTIONS"],
     credentials: true,
     allowedHeaders: [
@@ -64,12 +59,7 @@ const io = new Server(server, {
     ],
   },
   allowEIO3: true,
-  transports: ["polling"], // Use polling only for AWS App Runner reliability
-  pingTimeout: 60000,
-  pingInterval: 25000,
-  maxHttpBufferSize: 1e8,
-  connectTimeout: 45000,
-  allowUpgrades: false, // Disable WebSocket upgrade in AWS App Runner
+  transports: ["websocket", "polling"],
 });
 
 // Create ToolHandler
@@ -96,11 +86,7 @@ const bedrockClient = new NovaSonicBidirectionalStreamClient(
       maxConcurrentStreams: 10,
     },
     clientConfig: {
-      region: process.env.AWS_REGION || "eu-west-1",
-      // Credentials will be automatically loaded from:
-      // - Environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
-      // - IAM role (in AWS App Runner, EC2, ECS, Lambda)
-      // - Local credentials file ~/.aws/credentials (for local development)
+      region: process.env.AWS_REGION || "eu-west-1"
     },
   },
   toolHandler // Pass in toolHandler
@@ -133,27 +119,9 @@ setInterval(() => {
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, "../public")));
 
-// Add middleware to log requests and set proper headers
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url} - ${req.headers.origin || 'no-origin'}`);
-  
-  // Set additional headers for WebSocket support in AWS App Runner
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  
-  next();
-});
-
 // Socket.IO connection handler
 io.on("connection", (socket) => {
-  console.log("✅ New client connected:", socket.id);
-  console.log("Transport:", socket.conn.transport.name);
-  console.log("Client headers:", socket.handshake.headers);
-
-  // Log transport upgrades
-  socket.conn.on('upgrade', (transport) => {
-    console.log(`⬆️ Client ${socket.id} upgraded to:`, transport.name);
-  });
+  console.log("New client connected:", socket.id);
 
   // Create a unique session ID for this client
   const sessionId = socket.id;

@@ -2,58 +2,7 @@ import { AudioPlayer } from "./lib/play/AudioPlayer.js";
 import { ChatHistoryManager } from "./lib/util/ChatHistoryManager.js";
 
 // Connect to the server
-// In production, use current origin; in development, allow localhost
-// For AWS App Runner, we use polling only as WebSocket upgrade can be unreliable
-const socket = io(window.location.origin, {
-  path: '/socket.io/',
-  transports: ['polling'], // Use polling only for AWS App Runner reliability
-  reconnection: true,
-  reconnectionDelay: 1000,
-  reconnectionDelayMax: 5000,
-  reconnectionAttempts: 10,
-  timeout: 20000,
-  autoConnect: true,
-  forceNew: false
-});
-
-// Add detailed connection logging for debugging
-socket.on('connect', () => {
-  console.log('✅ Socket connected:', socket.id);
-  console.log('Transport:', socket.io.engine.transport.name);
-});
-
-socket.on('connect_error', (error) => {
-  console.error('❌ Connection error:', error.message);
-  console.error('Error details:', error);
-});
-
-socket.on('disconnect', (reason) => {
-  console.log('🔌 Socket disconnected:', reason);
-  if (reason === 'io server disconnect') {
-    // Server disconnected, need to reconnect manually
-    socket.connect();
-  }
-});
-
-socket.on('reconnect_attempt', (attemptNumber) => {
-  console.log('🔄 Reconnection attempt:', attemptNumber);
-});
-
-socket.on('reconnect_error', (error) => {
-  console.error('❌ Reconnection error:', error.message);
-});
-
-socket.on('reconnect_failed', () => {
-  console.error('❌ Reconnection failed after all attempts');
-});
-
-socket.io.engine.on('upgrade', (transport) => {
-  console.log('⬆️ Transport upgraded to:', transport.name);
-});
-
-socket.io.engine.on('upgradeError', (error) => {
-  console.error('❌ Transport upgrade error:', error.message);
-});
+const socket = io();
 
 // DOM elements
 const startButton = document.getElementById("start");

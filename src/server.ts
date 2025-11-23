@@ -84,8 +84,7 @@ const bedrockClient = new NovaSonicBidirectionalStreamClient(
       maxConcurrentStreams: 10,
     },
     clientConfig: {
-      region: process.env.AWS_REGION || "us-east-1",
-      credentials: fromIni({ profile: AWS_PROFILE_NAME }),
+      region: process.env.AWS_REGION || "us-east-1"
     },
   },
   toolHandler // Pass in toolHandler

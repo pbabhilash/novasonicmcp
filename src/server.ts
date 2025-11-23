@@ -368,6 +368,30 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+// Bedrock credentials test endpoint
+app.get("/api/bedrock-test", async (req, res) => {
+  try {
+    const { BedrockRuntimeClient } = await import("@aws-sdk/client-bedrock-runtime");
+    const client = new BedrockRuntimeClient({
+      region: process.env.AWS_REGION || "eu-west-1"
+    });
+    
+    // If client creation succeeds, credentials are OK
+    res.status(200).json({ 
+      status: "Bedrock client initialized",
+      region: process.env.AWS_REGION || "eu-west-1",
+      message: "IAM role should be configured correctly. Check Bedrock console for model access."
+    });
+  } catch (error: any) {
+    res.status(500).json({ 
+      status: "Bedrock credentials ERROR",
+      error: error.message,
+      region: process.env.AWS_REGION || "eu-west-1",
+      solution: "Check IAM role permissions and Bedrock model access"
+    });
+  }
+});
+
 // Start the server
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

@@ -50,6 +50,7 @@ app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
 const server = http.createServer(app);
 const io = new Server(server, {
+  path: '/socket.io/',
   cors: {
     origin: process.env.NODE_ENV === 'production' ? '*' : allowedOrigins,
     methods: ["GET", "POST", "OPTIONS"],
@@ -63,7 +64,12 @@ const io = new Server(server, {
     ],
   },
   allowEIO3: true,
-  transports: ["websocket", "polling"],
+  transports: ["polling", "websocket"], // Polling first for AWS App Runner
+  pingTimeout: 60000,
+  pingInterval: 25000,
+  upgradeTimeout: 30000,
+  maxHttpBufferSize: 1e8,
+  connectTimeout: 45000,
 });
 
 // Create ToolHandler
@@ -127,9 +133,27 @@ setInterval(() => {
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, "../public")));
 
+// Add middleware to log requests and set proper headers
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url} - ${req.headers.origin || 'no-origin'}`);
+  
+  // Set additional headers for WebSocket support in AWS App Runner
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  
+  next();
+});
+
 // Socket.IO connection handler
 io.on("connection", (socket) => {
-  console.log("New client connected:", socket.id);
+  console.log("✅ New client connected:", socket.id);
+  console.log("Transport:", socket.conn.transport.name);
+  console.log("Client headers:", socket.handshake.headers);
+
+  // Log transport upgrades
+  socket.conn.on('upgrade', (transport) => {
+    console.log(`⬆️ Client ${socket.id} upgraded to:`, transport.name);
+  });
 
   // Create a unique session ID for this client
   const sessionId = socket.id;

@@ -4,10 +4,56 @@ import { ChatHistoryManager } from "./lib/util/ChatHistoryManager.js";
 // Connect to the server
 // In production, use current origin; in development, allow localhost
 const socket = io(window.location.origin, {
-  transports: ['websocket', 'polling'],
+  path: '/socket.io/',
+  transports: ['polling', 'websocket'], // Start with polling, then upgrade
   reconnection: true,
   reconnectionDelay: 1000,
-  reconnectionAttempts: 5
+  reconnectionDelayMax: 5000,
+  reconnectionAttempts: 10,
+  timeout: 20000,
+  autoConnect: true,
+  forceNew: false,
+  upgrade: true,
+  rememberUpgrade: true
+});
+
+// Add detailed connection logging for debugging
+socket.on('connect', () => {
+  console.log('✅ Socket connected:', socket.id);
+  console.log('Transport:', socket.io.engine.transport.name);
+});
+
+socket.on('connect_error', (error) => {
+  console.error('❌ Connection error:', error.message);
+  console.error('Error details:', error);
+});
+
+socket.on('disconnect', (reason) => {
+  console.log('🔌 Socket disconnected:', reason);
+  if (reason === 'io server disconnect') {
+    // Server disconnected, need to reconnect manually
+    socket.connect();
+  }
+});
+
+socket.on('reconnect_attempt', (attemptNumber) => {
+  console.log('🔄 Reconnection attempt:', attemptNumber);
+});
+
+socket.on('reconnect_error', (error) => {
+  console.error('❌ Reconnection error:', error.message);
+});
+
+socket.on('reconnect_failed', () => {
+  console.error('❌ Reconnection failed after all attempts');
+});
+
+socket.io.engine.on('upgrade', (transport) => {
+  console.log('⬆️ Transport upgraded to:', transport.name);
+});
+
+socket.io.engine.on('upgradeError', (error) => {
+  console.error('❌ Transport upgrade error:', error.message);
 });
 
 // DOM elements

@@ -43,14 +43,18 @@ export class NovaSonicBidirectionalStreamClient {
       ...config.requestHandlerConfig,
     });
 
-    if (!config.clientConfig.credentials) {
-      throw new Error("No credentials provided");
-    }
+    // AWS SDK will automatically discover credentials in this order:
+    // 1. Environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+    // 2. IAM role (App Runner, EC2, ECS, Lambda) - Used in production
+    // 3. Credentials file (~/.aws/credentials) - Used in local development
+    // No need to throw error if credentials are undefined
 
     // Initialize Bedrock runtime client
     this.bedrockRuntimeClient = new BedrockRuntimeClient({
+      ...config.clientConfig,
       region: config.clientConfig.region || "eu-west-1",
       requestHandler: nodeHttp2Handler,
+      // credentials will be auto-discovered if not provided
     });
 
     this.inferenceConfig = config.inferenceConfig ?? {

@@ -17,11 +17,9 @@ const AWS_PROFILE_NAME = process.env.AWS_PROFILE || "default";
 // Create Express app and HTTP server
 const app = express();
 
-const allowedOrigins = ['*'] ;
-
 // Enable CORS with specific options
 const corsOptions = {
-  origin: '*',
+  origin: "*",
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: [

@@ -3,18 +3,17 @@ import { ChatHistoryManager } from "./lib/util/ChatHistoryManager.js";
 
 // Connect to the server
 // In production, use current origin; in development, allow localhost
+// For AWS App Runner, we use polling only as WebSocket upgrade can be unreliable
 const socket = io(window.location.origin, {
   path: '/socket.io/',
-  transports: ['polling', 'websocket'], // Start with polling, then upgrade
+  transports: ['polling'], // Use polling only for AWS App Runner reliability
   reconnection: true,
   reconnectionDelay: 1000,
   reconnectionDelayMax: 5000,
   reconnectionAttempts: 10,
   timeout: 20000,
   autoConnect: true,
-  forceNew: false,
-  upgrade: true,
-  rememberUpgrade: true
+  forceNew: false
 });
 
 // Add detailed connection logging for debugging

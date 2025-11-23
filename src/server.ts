@@ -64,12 +64,12 @@ const io = new Server(server, {
     ],
   },
   allowEIO3: true,
-  transports: ["polling", "websocket"], // Polling first for AWS App Runner
+  transports: ["polling"], // Use polling only for AWS App Runner reliability
   pingTimeout: 60000,
   pingInterval: 25000,
-  upgradeTimeout: 30000,
   maxHttpBufferSize: 1e8,
   connectTimeout: 45000,
+  allowUpgrades: false, // Disable WebSocket upgrade in AWS App Runner
 });
 
 // Create ToolHandler

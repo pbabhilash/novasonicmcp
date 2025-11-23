@@ -2,7 +2,6 @@
 import http from "http";
 import path from "path";
 import { Server } from "socket.io";
-import { fromIni } from "@aws-sdk/credential-providers";
 import cors from "cors";
 import { NovaSonicBidirectionalStreamClient } from "./core/client";
 import { Buffer } from "node:buffer";
@@ -11,8 +10,10 @@ import { McpManager } from "./services/mcp-manager-v2";
 ///import { McpManager } from "./services/mcp-manager";
 import { McpTool } from "./types/types";
 
-// Configure AWS credentials
-const AWS_PROFILE_NAME = process.env.AWS_PROFILE || "default";
+// AWS credentials will be automatically loaded from:
+// 1. Environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+// 2. IAM role (in AWS App Runner, EC2, ECS, Lambda)
+// 3. Local credentials file (for local development)
 
 // Create Express app and HTTP server
 const app = express();
@@ -85,7 +86,10 @@ const bedrockClient = new NovaSonicBidirectionalStreamClient(
     },
     clientConfig: {
       region: process.env.AWS_REGION || "us-east-1",
-      credentials: fromIni({ profile: AWS_PROFILE_NAME }),
+      // Credentials will be automatically loaded from:
+      // - Environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+      // - IAM role (in AWS App Runner, EC2, ECS, Lambda)
+      // - Local credentials file ~/.aws/credentials (for local development)
     },
   },
   toolHandler // Pass in toolHandler

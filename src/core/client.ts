@@ -472,7 +472,7 @@ export class NovaSonicBidirectionalStreamClient {
     console.error(`Error processing response stream for session:`, error);
     this.dispatchEvent(sessionId, "error", {
       source: "responseStream",
-      message: "处理响应流时出错",
+      message: "Error processing response stream",
       details: error instanceof Error ? error.message : String(error),
     });
   }

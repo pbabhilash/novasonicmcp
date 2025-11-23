@@ -392,6 +392,27 @@ app.get("/api/bedrock-test", async (req, res) => {
   }
 });
 
+// Dental receptionist configuration endpoint
+app.get("/api/dental-config", (req, res) => {
+  try {
+    // Load the dental receptionist config
+    const configPath = path.join(__dirname, "../dental-receptionist-config.js");
+    delete require.cache[require.resolve(configPath)]; // Clear cache to get fresh config
+    const config = require(configPath);
+    
+    res.status(200).json({
+      systemPrompt: config.DENTAL_RECEPTIONIST_PROMPT,
+      knowledgeBase: config.DENTAL_KNOWLEDGE_BASE
+    });
+  } catch (error: any) {
+    console.error("Error loading dental config:", error);
+    res.status(500).json({ 
+      error: "Failed to load dental receptionist configuration",
+      details: error.message 
+    });
+  }
+});
+
 // Start the server
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

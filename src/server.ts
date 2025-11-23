@@ -17,9 +17,11 @@ const AWS_PROFILE_NAME = process.env.AWS_PROFILE || "default";
 // Create Express app and HTTP server
 const app = express();
 
+const allowedOrigins = ['*'] ;
+
 // Enable CORS with specific options
 const corsOptions = {
-  origin: "http://localhost:3001",
+  origin: '*',
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: [
@@ -45,7 +47,7 @@ app.options("*", cors(corsOptions));
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3001",
+    origin: '*',
     methods: ["GET", "POST", "OPTIONS"],
     credentials: true,
     allowedHeaders: [
@@ -84,8 +86,7 @@ const bedrockClient = new NovaSonicBidirectionalStreamClient(
       maxConcurrentStreams: 10,
     },
     clientConfig: {
-      region: process.env.AWS_REGION || "us-east-1",
-      credentials: fromIni({ profile: AWS_PROFILE_NAME }),
+      region: process.env.AWS_REGION || "eu-west-1"
     },
   },
   toolHandler // Pass in toolHandler

@@ -51,7 +51,7 @@ app.options("*", cors(corsOptions));
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3001",
+    origin: process.env.NODE_ENV === 'production' ? '*' : allowedOrigins,
     methods: ["GET", "POST", "OPTIONS"],
     credentials: true,
     allowedHeaders: [

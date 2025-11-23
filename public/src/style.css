@@ -1,5 +1,5 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Poppins', Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -11,16 +11,21 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Tabeo Brand Colors */
+  --tabeo-primary: #3CAABC;
+  --tabeo-secondary: #2B7B8A;
+  --tabeo-light: #5BC8DC;
 }
 
 a {
   font-weight: 500;
-  color: #00bfff;
+  color: var(--tabeo-primary);
   text-decoration: inherit;
 }
 
 a:hover {
-  color: #1e90ff;
+  color: var(--tabeo-light);
 }
 
 body {
@@ -55,13 +60,136 @@ h1 {
   overflow: hidden;
 }
 
+/* Header Styles */
+.app-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  z-index: 100;
+  background: transparent;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--tabeo-primary), var(--tabeo-light));
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(60, 170, 188, 0.3);
+}
+
+.brand-icon .material-icons {
+  font-size: 22px;
+  color: white;
+}
+
+.brand-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--tabeo-primary);
+  margin: 0;
+  text-align: left;
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+}
+
+/* Status Badge */
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.status-badge.connected .status-dot {
+  background: #34c759;
+  box-shadow: 0 0 8px #34c759;
+}
+
+.status-badge.disconnected .status-dot {
+  background: #ff3b30;
+  box-shadow: 0 0 8px #ff3b30;
+}
+
+/* Icon Button */
+.icon-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.icon-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--tabeo-primary);
+  transform: translateY(-2px);
+}
+
+.icon-button .material-icons {
+  font-size: 20px;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 /* 用户头部样式 */
 #user-header {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 8px 16px;
-  margin-top: 16px;
+  margin-top: 70px;
   margin-bottom: 32px;
 }
 
@@ -429,17 +557,9 @@ button:disabled,
   opacity: 0.5;
 }
 
-/* 状态样式 */
+/* 状态样式 - Hidden, now in header */
 #status {
-  padding: 10px;
-  border-radius: 4px;
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  z-index: 100;
-  font-size: 14px;
-  background-color: rgba(50, 50, 50, 0.7);
-  color: #ffffff;
+  display: none;
 }
 
 .connected {
@@ -689,23 +809,7 @@ button:disabled,
   color: #ffffff;
 }
 
-/* 配置按钮 */
-#config-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 36px;
-  height: 36px;
-  background-color: rgba(50, 50, 50, 0.7);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 110;
-  transition: all 0.3s ease;
-}
-
+/* 配置按钮 - Additional hover styles */
 #config-button:hover {
   background-color: rgba(70, 70, 70, 0.9);
   transform: scale(1.05);

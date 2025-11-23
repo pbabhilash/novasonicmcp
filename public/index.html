@@ -2,20 +2,35 @@
 <html>
 
 <head>
-    <title>Audio Streaming to Bedrock</title>
+    <title>Tabeo AI Receptionist</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/src/style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="/socket.io/socket.io.js"></script>
 </head>
 
 <body>
     <div id="app">
-        <div id="status" class="disconnected">Disconnected</div>
-
-        <!-- Settings Button -->
-        <div id="config-button">
-            <i class="material-icons">settings</i>
+        <!-- Header Section with Title -->
+        <div class="app-header">
+            <div class="header-content">
+                <div class="brand-section">
+                    <div class="brand-icon">
+                        <i class="material-icons">support_agent</i>
+                    </div>
+                    <h1 class="brand-title">Tabeo AI Receptionist - Demo</h1>
+                </div>
+                <div class="header-actions">
+                    <div id="status" class="status-badge disconnected">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Disconnected</span>
+                    </div>
+                    <button id="config-button" class="icon-button">
+                        <i class="material-icons">settings</i>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- User Header -->

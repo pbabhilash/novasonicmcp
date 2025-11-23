@@ -2,7 +2,13 @@ import { AudioPlayer } from "./lib/play/AudioPlayer.js";
 import { ChatHistoryManager } from "./lib/util/ChatHistoryManager.js";
 
 // Connect to the server
-const socket = io();
+// In production, use current origin; in development, allow localhost
+const socket = io(window.location.origin, {
+  transports: ['websocket', 'polling'],
+  reconnection: true,
+  reconnectionDelay: 1000,
+  reconnectionAttempts: 5
+});
 
 // DOM elements
 const startButton = document.getElementById("start");

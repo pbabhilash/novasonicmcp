@@ -17,10 +17,15 @@ import { McpTool } from "./types/types";
 
 // Create Express app and HTTP server
 const app = express();
+// Determine CORS origin based on environment
+const allowedOrigins = process.env.NODE_ENV === 'production' 
+  ? ['*'] // Allow all origins in production (App Runner)
+  : ['http://localhost:3000', 'http://localhost:3001'];
+
 
 // Enable CORS with specific options
 const corsOptions = {
-  origin: "http://localhost:3001",
+  origin: process.env.NODE_ENV === 'production' ? '*' : allowedOrigins,
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: [
@@ -85,7 +90,7 @@ const bedrockClient = new NovaSonicBidirectionalStreamClient(
       maxConcurrentStreams: 10,
     },
     clientConfig: {
-      region: process.env.AWS_REGION || "us-east-1",
+      region: process.env.AWS_REGION || "eu-west-1",
       // Credentials will be automatically loaded from:
       // - Environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
       // - IAM role (in AWS App Runner, EC2, ECS, Lambda)
